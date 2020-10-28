@@ -23,6 +23,17 @@
 
 <body>
   <div id="root"></div>
+  <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+      const el = document.getElementById('root');
+      JSConsole.init(el);
+      el.addEventListener('jsconsole-input-changed', e => console.log(e));
+      el.addEventListener('jsconsole-input-keypress', e => console.log(e));
+      el.addEventListener('jsconsole-input-key-pressed', e => console.log(e));
+      el.addEventListener('jsconsole-run', e => console.log(e));
+      el.addEventListener('jsconsole-run', e => console.log(e));
+    });
+  </script>
   <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

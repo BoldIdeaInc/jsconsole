@@ -22,12 +22,22 @@ class App extends Component {
     const console = this.console;
 
     if (command[0] !== ':') {
+      const event = new CustomEvent('jsconsole-run', {
+        bubbles: true,
+        cancelable: true,
+        detail: { console, command }
+      });
+      this.app.dispatchEvent(event);
+      if (event.defaultPrevented) return;
+
       console.push({
         type: 'command',
         command,
         value: command,
       });
+
       const res = await run(command);
+
       console.push({
         command,
         type: 'response',
@@ -42,6 +52,15 @@ class App extends Component {
       args = [parseInt(cmd, 10)];
       cmd = 'history';
     }
+
+    const event = new CustomEvent('jsconsole-run-internal', {
+      bubbles: true,
+      cancelable: true,
+      detail: { console, args, command: cmd }
+    });
+    this.app.dispatchEvent(event);
+    if (event.defaultPrevented) return;
+
 
     if (!internalCommands[cmd]) {
       console.push({
@@ -79,6 +98,13 @@ class App extends Component {
     } else {
       this.onRun(':welcome');
     }
+    const event = new CustomEvent('jsconsole-loaded', {
+      bubbles: true,
+      detail: {
+        app: this
+      }
+    });
+    this.app.dispatchEvent(event);
   }
 
   triggerFocus(e) {

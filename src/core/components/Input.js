@@ -18,7 +18,7 @@ class Input extends Component {
     this.onKeyPress = this.onKeyPress.bind(this);
   }
 
-  onChange() {
+  onChange(e) {
     const { value } = this.input;
     const length = value.split('\n').length;
     this.setState({
@@ -26,9 +26,24 @@ class Input extends Component {
       rows: length < 20 ? length : 20,
       value,
     });
+    this.input.dispatchEvent(new CustomEvent('jsconsole-input-changed', {
+      bubbles: true,
+      detail: {
+        originalEvent: e,
+        state: this.state
+      }
+    }));
   }
 
   async onKeyPress(e) {
+    const event = new CustomEvent('jsconsole-input-keypress', {
+      cancelable: true,
+      bubbles: true,
+      detail: {originalEvent: e, state: this.state}
+    });
+    const defaultPrevented = !this.input.dispatchEvent(event);
+    if (defaultPrevented) return;
+
     const code = keycodes[e.keyCode];
     const { multiline } = this.state;
     const { history } = this.props;
@@ -87,6 +102,14 @@ class Input extends Component {
       window.scrollTo(0, document.body.scrollHeight);
       return;
     }
+
+    this.input.dispatchEvent(new CustomEvent('jsconsole-input-key-pressed', {
+      bubbles: true,
+      detail: {
+        originalEvent: e,
+        state: this.state
+      }
+    }));
   }
 
   render() {
