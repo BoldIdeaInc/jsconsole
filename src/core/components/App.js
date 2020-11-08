@@ -92,19 +92,25 @@ class App extends Component {
   componentDidMount() {
     createContainer();
     bindConsole(this.console);
+
+    console.log('<App> jsconsole Loaded');
+
+    const event = new CustomEvent('jsconsole-loaded', {
+      bubbles: true,
+      cancelable: true,
+      detail: {
+        app: this
+      }
+    });
+    this.app.dispatchEvent(event);
+    if (event.defaultPrevented) return;
+
     const query = decodeURIComponent(window.location.search.substr(1));
     if (query) {
       this.onRun(query);
     } else {
       this.onRun(':welcome');
     }
-    const event = new CustomEvent('jsconsole-loaded', {
-      bubbles: true,
-      detail: {
-        app: this
-      }
-    });
-    this.app.dispatchEvent(event);
   }
 
   triggerFocus(e) {
