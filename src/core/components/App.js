@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import Console from './Console';
 import Input from '../containers/Input';
 
-import run, { bindConsole, createContainer } from '../lib/run';
+import run, { bindConsole, createContainer, setContainer } from '../lib/run';
 import internalCommands from '../lib/internal-commands';
 
 // this is lame, but it's a list of key.code that do stuff in the input that we _want_.
@@ -16,6 +16,7 @@ class App extends Component {
     super(props);
     this.onRun = this.onRun.bind(this);
     this.triggerFocus = this.triggerFocus.bind(this);
+    this.contextFrame = props.contextFrame;
   }
 
   async onRun(command) {
@@ -90,7 +91,11 @@ class App extends Component {
   }
 
   componentDidMount() {
-    createContainer();
+    if (this.contextFrame) {
+      setContainer(this.contextFrame);
+    } else {
+      createContainer();
+    }
     bindConsole(this.console);
 
     console.log('<App> jsconsole Loaded');

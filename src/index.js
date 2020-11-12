@@ -8,13 +8,13 @@ import './core/jsconsole.css';
 
 
 window.JSConsole = {
-  init: function(rootEl) {
+  init: function(rootEl, contextFrame) {
     // Create a reusable render method that we can call more than once
     let render = () => {
       // Dynamically import our main App component, and render it
       const App = require('./core/containers/App').default;
 
-      ReactDOM.render(React.createElement(Provider, { store }, <App />), rootEl);
+      ReactDOM.render(React.createElement(Provider, { store }, <App contextFrame={contextFrame}/>), rootEl);
     };
 
     if (module.hot) {
