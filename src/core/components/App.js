@@ -90,15 +90,23 @@ class App extends Component {
     return;
   }
 
-  componentDidMount() {
+  initFrame() {
     if (this.contextFrame) {
       setContainer(this.contextFrame);
     } else {
-      createContainer();
+      this.contextFrame = createContainer();
     }
     bindConsole(this.console);
 
-    console.log('<App> jsconsole Loaded');
+    // clear and re-bind the console when the frame is reloaded
+    this.contextFrame.addEventListener('load', _ => {
+      this.console.clear();
+      bindConsole(this.console);
+    });
+  }
+
+  componentDidMount() {
+    this.initFrame();
 
     const event = new CustomEvent('jsconsole-loaded', {
       bubbles: true,
