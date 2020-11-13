@@ -76,6 +76,16 @@ class Console extends Component {
   }
 
   push(command) {
+    const event = new CustomEvent('jsconsole-push', {
+      bubbles: true,
+      cancelable: true,
+      detail: {
+        command: command
+      }
+    });
+    this.el.dispatchEvent(event);
+    if (event.defaultPrevented) return;
+
     const next = getNext();
     this.setState({ [next]: command });
   }
@@ -156,6 +166,7 @@ class Console extends Component {
     return (
       <div
         className="react-console-container"
+        ref={e => (this.el = e)}
         onClick={e => {
           e.stopPropagation(); // prevent the focus on the input element
         }}
