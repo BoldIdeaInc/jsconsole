@@ -25,6 +25,13 @@ export const bindConsole = __console => {
       __console[method].apply(__console, args);
     };
   });
+
+  // capture errors
+  if (!container.contentWindow.__errorCatcher) {
+    container.contentWindow.__errorCatcher = container.contentWindow.addEventListener('error', event => {
+      __console.error(event.error);
+    });
+  }
 };
 
 export const getContainer = () => container;
