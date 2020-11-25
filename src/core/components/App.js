@@ -16,7 +16,6 @@ class App extends Component {
     super(props);
     this.onRun = this.onRun.bind(this);
     this.triggerFocus = this.triggerFocus.bind(this);
-    this.contextFrame = props.contextFrame;
   }
 
   async onRun(command) {
@@ -90,17 +89,31 @@ class App extends Component {
     return;
   }
 
-  initFrame() {
-    if (this.contextFrame) {
-      setContainer(this.contextFrame);
+  componentDidUpdate(prevProps) {
+    if (prevProps.contextFrame !== this.props.contextFrame) {
+      this.initFrame(this.props.contextFrame);
+    }
+  }
+
+  initFrame(frame) {
+    if (frame) {
+      this.contextFrame = frame;
+      // destroy proxy container if it exists
+      const proxyContainer = document.querySelector('iframe[name="<proxy>"]');
+      if (proxyContainer) proxyContainer.parentNode.removeChild(proxyContainer);
+      setContainer(frame);
     } else {
       this.contextFrame = createContainer();
     }
+    console.log('Binding console');
     bindConsole(this.console);
 
-    // clear and re-bind the console when the frame is reloaded
-    this.contextFrame.addEventListener('load', _ => {
+    // re-bind the console when the frame is reloaded. In order for this to work, the iframe
+    // document must dispatch a custom event called "iframe-loadstart" at the top of the document,
+    // so that the console can be bound as early as possible.
+    this.contextFrame.addEventListener('iframe-loadstart', event => {
       this.console.clear();
+      console.log('Binding console on frame load start');
       bindConsole(this.console);
     });
   }

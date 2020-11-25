@@ -46,6 +46,7 @@ export function createContainer() {
   container.setAttribute('name', '<proxy>');
   document.body.appendChild(container);
   setContainer(container);
+  return container;
 }
 
 export function setContainer(iframe) {
