@@ -19,9 +19,10 @@ export const bindConsole = __console => {
     'clear',
   ];
 
+  container.contentWindow.console = {};
   apply.forEach(method => {
     container.contentWindow.console[method] = (...args) => {
-      window.console[method].apply(window.console, args);
+      //window.console[method].apply(window.console, args);
       __console[method].apply(__console, args);
     };
   });

@@ -93,6 +93,13 @@ class Console extends Component {
   clear() {
     this.state = {}; // eslint-disable-line react/no-direct-mutation-state
     this.forceUpdate();
+    // Hide the console for a brief period of time, giving some visual indication that the console
+    // has cleared. This is useful in situations when the console clears on page reload, and the
+    // page is generating the same logs.
+    this.el.style.display = 'none';
+    setTimeout(() => {
+      this.el.style.display = '';
+    }, 200);
   }
 
   error = (...rest) => {

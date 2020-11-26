@@ -27,6 +27,7 @@
     "copy-to-clipboard": "^3.0.8",
     "is-url": "^1.2.4",
     "lodash": "^4.17.20",
+    "nodemon": "^2.0.6",
     "preact": "^8.2.5",
     "prop-types": "^15.7.2",
     "react-copy-to-clipboard": "^5.0.0",
@@ -102,7 +103,8 @@
     "watch": "nodemon -w src/ -e css -x 'npm run styles'",
     "lib": "rm -rf dist; npm run styles; NODE_ENV=production babel src/core --out-dir dist --copy-files --ignore '__tests__'",
     "deploy": "npm run build && s3_website push",
-    "prepare": "npm run lib"
+    "prepare": "npm run lib",
+    "buildwatch": "nodemon -w src/ -x 'npm run build'"
   },
   "main": "dist/index.js",
   "files": [
