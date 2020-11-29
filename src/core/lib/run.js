@@ -27,12 +27,27 @@ export const bindConsole = __console => {
     };
   });
 
-  // capture errors
+  // catch bubbled errors
   if (!container.contentWindow.__errorCatcher) {
     container.contentWindow.__errorCatcher = container.contentWindow.addEventListener('error', event => {
       __console.error(event.error);
     });
   }
+
+  // capture load errors from script, img, or link elements (which don't bubble)
+  if (!container.contentWindow.__loadErrorCatcher) {
+    container.contentWindow.__loadErrorCatcher = container.contentWindow.addEventListener('error', event => {
+      const el = event.target;
+      if (!el) return;
+      if (!el.tagName.match(/SCRIPT|IMG|LINK/)) return;
+      const srcAttr = el.tagName === 'LINK' ? 'href' : 'src';
+      const src = el.getAttribute(srcAttr);
+      if (src === '') return;
+      const msg = `Could not load "${src}": either the resource was not found, there was a network error, or the resource is corrupted.`;
+      __console.error(msg);
+    }, true);
+  }
+
 };
 
 export const getContainer = () => container;
