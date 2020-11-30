@@ -7,6 +7,7 @@ import copy from 'copy-to-clipboard';
 let container = null;
 
 export const bindConsole = __console => {
+  console.log('Binding console to ', container.contentWindow);
   // supported methods
   const apply = [
     'log',
@@ -19,24 +20,32 @@ export const bindConsole = __console => {
     'clear',
   ];
 
-  container.contentWindow.console = {};
+  const frameWindow = container.contentWindow;
+  const frameDocument = container.contentDocument;
+
+  frameWindow.copy = copy;
+  frameWindow.$$ = s => Array.from(frameDocument.querySelectorAll(s));
+  frameWindow.$ = s => frameDocument.querySelector(s);
+
+  frameWindow.__nativeConsole = frameWindow.console;
+  frameWindow.console = {};
   apply.forEach(method => {
-    container.contentWindow.console[method] = (...args) => {
+    frameWindow.console[method] = (...args) => {
       //window.console[method].apply(window.console, args);
       __console[method].apply(__console, args);
     };
   });
 
   // catch bubbled errors
-  if (!container.contentWindow.__errorCatcher) {
-    container.contentWindow.__errorCatcher = container.contentWindow.addEventListener('error', event => {
+  if (!frameWindow.__errorCatcher) {
+    frameWindow.__errorCatcher = frameWindow.addEventListener('error', event => {
       __console.error(event.error);
     });
   }
 
   // capture load errors from script, img, or link elements (which don't bubble)
-  if (!container.contentWindow.__loadErrorCatcher) {
-    container.contentWindow.__loadErrorCatcher = container.contentWindow.addEventListener('error', event => {
+  if (!frameWindow.__loadErrorCatcher) {
+    frameWindow.__loadErrorCatcher = frameWindow.addEventListener('error', event => {
       const el = event.target;
       if (!el) return;
       if (!el.tagName.match(/SCRIPT|IMG|LINK/)) return;
@@ -67,12 +76,6 @@ export function createContainer() {
 
 export function setContainer(iframe) {
   container = iframe;
-  const win = container.contentWindow;
-  const doc = container.contentDocument;
-
-  win.copy = copy;
-  win.$$ = s => Array.from(doc.querySelectorAll(s));
-  win.$ = s => doc.querySelector(s);
 }
 
 export default async function run(command) {
