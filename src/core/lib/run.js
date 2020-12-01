@@ -7,7 +7,6 @@ import copy from 'copy-to-clipboard';
 let container = null;
 
 export const bindConsole = __console => {
-  console.log('Binding console to ', container.contentWindow);
   // supported methods
   const apply = [
     'log',

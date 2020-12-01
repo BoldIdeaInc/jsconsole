@@ -96,16 +96,18 @@ class App extends Component {
   }
 
   initFrame(frame) {
-    if (frame) {
+    if (typeof frame !== 'undefined') {
       this.contextFrame = frame;
       // destroy proxy container if it exists
       const proxyContainer = document.querySelector('iframe[name="<proxy>"]');
       if (proxyContainer) proxyContainer.parentNode.removeChild(proxyContainer);
-      setContainer(frame);
-    } else {
+    }
+    if (!this.contextFrame) {
+      // create proxy container
       this.contextFrame = createContainer();
     }
-    console.log('Binding console');
+    console.log('[jsconsole] initFrame: Binding console to frame', this.contextFrame);
+    setContainer(this.contextFrame);
     bindConsole(this.console);
 
     // re-bind the console when the frame is reloaded. In order for this to work, the iframe
@@ -113,13 +115,13 @@ class App extends Component {
     // so that the console can be bound as early as possible.
     this.contextFrame.addEventListener('iframe-loadstart', event => {
       this.console.clear();
-      console.log('Binding console on frame load start');
+      console.log('[jsconsole] iframe-loadstart: Binding console to frame', this.contextFrame);
       bindConsole(this.console);
     });
   }
 
   componentDidMount() {
-    this.initFrame();
+    this.initFrame(this.props.contextFrame);
 
     const event = new CustomEvent('jsconsole-loaded', {
       bubbles: true,
