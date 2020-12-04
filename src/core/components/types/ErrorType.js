@@ -1,31 +1,48 @@
 import React, { Component } from 'react';
-import ObjectType from './ObjectType';
+
+import StackTracey from 'stacktracey';
 
 class ErrorType extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       open: props.open,
     };
   }
 
-  render() {
-    const { value, shallow = true, filter, allowOpen } = this.props;
-    const { open } = this.state;
+  formatStackItem(item) {
+    const fileName = item.fileName || '<anonymous>';
+    let location = fileName;
+    if (item.line) location += `:${item.line}`;
+    if (item.column) location += `:${item.column}`;
+    if (item.callee) {
+      return location ? `in ${item.callee} (${location})` : `in ${item.callee}`;
+    } else {
+      return `at ${location}`;
+    }
+  }
 
-    const sig = value.name || value.constructor.name;
+  render() {
+    const { value } = this.props;
+    const { open } = this.state;
+    const displayName = value.name || value.constructor.name;
+    const type = 'error';
+
+    const stack = new StackTracey(value.stack);
 
     return (
-      <ObjectType
-        filter={filter}
-        allowOpen={allowOpen}
-        type="error"
-        shallow={shallow}
-        open={open}
-        value={value}
-        displayName={sig}
-      />
+      <div className={`type ${type}`}>
+        <div className="header">
+          <em>{displayName}</em>: {value.message}
+        </div>
+        <div className="group">
+          {stack.items.map((item, i) => {
+            return (
+              <div className="error-stack-item">{this.formatStackItem(item)}</div>
+            );
+          })}
+        </div>
+      </div>
     );
   }
 }

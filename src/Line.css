@@ -80,8 +80,9 @@
 }
 
 .Line .error em,
+.Line .error .header,
 .Line .error .bareString {
-  color: #F44336;
+  color: #F44337;
 }
 
 .Line .sep {
