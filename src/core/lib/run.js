@@ -141,7 +141,12 @@ export default async function run(command) {
 
 export function preProcess(content) {
   var wrapped = '(async () => {' + content + '})()';
-  var root = parse(wrapped, { ecmaVersion: 8 });
+  try {
+    var root = parse(wrapped, { ecmaVersion: 8 });
+  } catch (error) {
+    // allow code to be run as normal so native parse error can bubble up
+    return {additionalCode: null, content: content};
+  }
   var body = root.program.body[0].expression.callee.body;
 
   var changes = [];
