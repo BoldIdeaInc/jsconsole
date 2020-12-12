@@ -117,7 +117,7 @@ export default async function run(command) {
         const blob = new Blob([additionalCode], {
           type: 'application/javascript',
         });
-        script.src = URL.createObjectURL(blob);
+        script.src = container.contentWindow.URL.createObjectURL(blob);
         container.contentWindow.onerror = (message, file, line, col, error) => {
           res.error = true;
           res.value = error;
