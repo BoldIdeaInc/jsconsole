@@ -33,7 +33,7 @@ class ErrorType extends Component {
     return (
       <div className={`type ${type}`}>
         <div className="header">
-          <em>{displayName}</em>: {value.message}
+          {displayName}: {value.message}
         </div>
         <div className="group">
           {stack.items.map((item, i) => {
