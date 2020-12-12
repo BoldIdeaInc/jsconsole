@@ -47,7 +47,7 @@ export const bindConsole = __console => {
     frameWindow.__loadErrorCatcher = frameWindow.addEventListener('error', event => {
       const el = event.target;
       if (!el) return;
-      if (!el.tagName.match(/SCRIPT|IMG|LINK/)) return;
+      if (!el.tagName || !el.tagName.match(/SCRIPT|IMG|LINK/)) return;
       const srcAttr = el.tagName === 'LINK' ? 'href' : 'src';
       const src = el.getAttribute(srcAttr);
       if (src === '') return;
