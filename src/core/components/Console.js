@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Line from './Line';
+import cloneDeep from 'lodash/cloneDeep';
 
 let guid = 0;
 const getNext = () => guid++;
@@ -107,7 +108,7 @@ class Console extends Component {
     this.push({
       error: true,
       html,
-      value: args,
+      value: cloneDeep(args),
       type: 'log',
     });
   };
@@ -122,7 +123,7 @@ class Console extends Component {
       rest.unshift(new AssertError(msg));
       this.push({
         error: true,
-        value: rest,
+        value: cloneDeep(rest),
         type: 'log',
       });
     }
@@ -132,7 +133,7 @@ class Console extends Component {
     const { html, args } = interpolate(...rest);
 
     this.push({
-      value: args,
+      value: cloneDeep(args),
       html,
       open: true,
       type: 'log',
@@ -145,7 +146,7 @@ class Console extends Component {
       error: true,
       level: 'warn',
       html,
-      value: args,
+      value: cloneDeep(args),
       type: 'log',
     });
   }
@@ -157,7 +158,7 @@ class Console extends Component {
     const { html, args } = interpolate(...rest);
 
     this.push({
-      value: args,
+      value: cloneDeep(args),
       html,
       type: 'log',
     });
