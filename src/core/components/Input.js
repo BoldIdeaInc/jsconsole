@@ -119,6 +119,7 @@ class Input extends Component {
         {/*<Autocomplete value={this.state.value} />*/}
         <textarea
           className="cli"
+          spellCheck="false"
           rows={this.state.rows}
           autoFocus={autoFocus}
           ref={e => {
