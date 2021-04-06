@@ -95,7 +95,7 @@ class Input extends Component {
       }
 
       this.props.addHistory(command);
-      this.setState({ historyCursor: history.length + 1, value: '' });
+      this.setState({ historyCursor: history.length + 1, value: '', rows: 1 });
       e.preventDefault();
       await this.props.onRun(command);
       // Don't use `this.input.scrollIntoView();` as it messes with iframes
