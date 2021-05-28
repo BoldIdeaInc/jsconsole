@@ -28,12 +28,22 @@ class ErrorType extends Component {
     const displayName = value.name || value.constructor.name;
     const type = 'error';
 
+    let locationInfo;
+    if (value.fileName) {
+      locationInfo = value.fileName.replace(/\/$/, '').split('/').pop();
+      if (value.lineNumber) locationInfo += `:${value.lineNumber}`;
+      if (value.columnNumber) locationInfo += `:${value.columnNumber}`;
+    }
+
     const stack = new StackTracey(value.stack);
 
     return (
       <div className={`type ${type}`}>
         <div className="header">
-          {displayName}: {value.message}
+          <span className="message">{displayName}: {value.message}</span>
+          <span className="location-info">
+            {locationInfo}
+          </span>
         </div>
         <div className="group">
           {stack.items.map((item, i) => {

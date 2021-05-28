@@ -53,3 +53,7 @@
 .theme-dark a {
   color: #c678dd;
 }
+
+.theme-dark .Line .type.error .location-info {
+  color: white;
+}

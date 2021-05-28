@@ -22,7 +22,7 @@ export const bindConsole = __console => {
   const frameWindow = container.contentWindow;
   const frameDocument = container.contentDocument;
 
-  frameWindow.copy = copy;
+  frameWindow.$copy = copy;
   frameWindow.$$ = s => Array.from(frameDocument.querySelectorAll(s));
   frameWindow.$ = s => frameDocument.querySelector(s);
 
@@ -38,7 +38,20 @@ export const bindConsole = __console => {
   // catch bubbled errors
   if (!frameWindow.__errorCatcher) {
     frameWindow.__errorCatcher = frameWindow.addEventListener('error', event => {
-      __console.error(event.error);
+      console.log('JSConsole caught error event:', event);
+      console.log('  error:', event.error);
+      console.log('  error.stack:', event.error.stack);
+      let error = event.error;
+      if (!(error instanceof Error)) {
+        error = new Error(error);
+      }
+      if (!error.fileName && event.filename) {
+        error.fileName = event.filename;
+        error.lineNumber = event.lineno;
+        error.columnNumber = event.colno;
+      }
+      error.stack = event.error.stack;
+      __console.error(error);
     });
   }
 

@@ -57,6 +57,20 @@
   background-image: url(/error.svg);
 }
 
+.Line .type.error {
+  flex: 1;
+}
+.Line .type.error .header {
+  display: flex;
+}
+.Line .type.error .header .message {
+  flex: 1;
+}
+.Line .type.error .header .location-info {
+  padding-left: 2em;
+  color: black;
+}
+
 .Line:hover .LineNav,
 .Line:focus .LineNav {
   display: block;
