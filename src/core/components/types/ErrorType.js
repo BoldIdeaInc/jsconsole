@@ -29,13 +29,25 @@ class ErrorType extends Component {
     const type = 'error';
 
     let locationInfo;
-    if (value.fileName) {
+    if (!value.__ignoreLocation && value.fileName) {
       locationInfo = value.fileName.replace(/\/$/, '').split('/').pop();
       if (value.lineNumber) locationInfo += `:${value.lineNumber}`;
       if (value.columnNumber) locationInfo += `:${value.columnNumber}`;
     }
 
-    const stack = new StackTracey(value.stack);
+    let stackEl;
+    if (!value.__ignoreStack) {
+      const stack = new StackTracey(value.stack);
+      stackEl = (
+        <div className="group">
+          {stack.items.map((item, i) => {
+            return (
+              <div className="error-stack-item">{this.formatStackItem(item)}</div>
+            );
+          })}
+        </div>
+      );
+    }
 
     return (
       <div className={`type ${type}`}>
@@ -45,13 +57,7 @@ class ErrorType extends Component {
             {locationInfo}
           </span>
         </div>
-        <div className="group">
-          {stack.items.map((item, i) => {
-            return (
-              <div className="error-stack-item">{this.formatStackItem(item)}</div>
-            );
-          })}
-        </div>
+        {stackEl}
       </div>
     );
   }

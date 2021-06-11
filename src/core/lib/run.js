@@ -22,11 +22,14 @@ export const bindConsole = __console => {
   const frameWindow = container.contentWindow;
   const frameDocument = container.contentDocument;
 
-  frameWindow.$copy = copy;
-  frameWindow.$$ = s => Array.from(frameDocument.querySelectorAll(s));
-  frameWindow.$ = s => frameDocument.querySelector(s);
+  if (!frameWindow.$copy) frameWindow.$copy = copy;
+  if (!frameWindow.$$) frameWindow.$$ = s => Array.from(frameDocument.querySelectorAll(s));
+  if (!frameWindow.$) frameWindow.$ = s => frameDocument.querySelector(s);
 
-  frameWindow.__nativeConsole = frameWindow.console;
+  // override window.console
+  if (!frameWindow.__nativeConsole) {
+    frameWindow.__nativeConsole = frameWindow.console;
+  }
   frameWindow.console = {};
   apply.forEach(method => {
     frameWindow.console[method] = (...args) => {
@@ -35,12 +38,12 @@ export const bindConsole = __console => {
     };
   });
 
+  if (!frameWindow.__myTestVar) {
+  }
+
   // catch bubbled errors
   if (!frameWindow.__errorCatcher) {
-    frameWindow.__errorCatcher = frameWindow.addEventListener('error', event => {
-      console.log('JSConsole caught error event:', event);
-      console.log('  error:', event.error);
-      console.log('  error.stack:', event.error.stack);
+    frameWindow.__errorCatcher = event => {
       let error = event.error;
       if (!(error instanceof Error)) {
         error = new Error(error);
@@ -52,12 +55,31 @@ export const bindConsole = __console => {
       }
       error.stack = event.error.stack;
       __console.error(error);
-    });
+    };
+    frameWindow.addEventListener('error', frameWindow.__errorCatcher);
   }
 
-  // capture load errors from script, img, or link elements (which don't bubble)
+  if (!frameWindow.__rejectedPromiseCatcher) {
+    frameWindow.__rejectedPromiseCatcher = event => {
+      let error;
+      if (!(event.reason instanceof Error)) {
+        error = new Error(`Uncaught (in promise): ${event.reason}`);
+        // The event doesn't contain error information. The Erorr we create will contain
+        // misleading stack info. We "tag" the error so the console renderer can ignore the
+        // potentially misleading info
+        error.__ignoreStack = true;
+        error.__ignoreLocation = true;
+      } else {
+        error = event.reason;
+        error.message = `Uncaught (in promise): ${error.message}`;
+      }
+      __console.error(error);
+    };
+    frameWindow.addEventListener('unhandledrejection', frameWindow.__rejectedPromiseCatcher);
+  }
+
   if (!frameWindow.__loadErrorCatcher) {
-    frameWindow.__loadErrorCatcher = frameWindow.addEventListener('error', event => {
+    frameWindow.__loadErrorCatcher = event => {
       const el = event.target;
       if (!el) return;
       if (!el.tagName || !el.tagName.match(/SCRIPT|IMG|LINK/)) return;
@@ -66,7 +88,9 @@ export const bindConsole = __console => {
       if (src === '') return;
       const msg = `Could not load "${src}": either the resource was not found, there was a network error, or the resource is corrupted.`;
       __console.error(msg);
-    }, true);
+    };
+    // capture load errors from script, img, or link elements (which don't bubble)
+    frameWindow.addEventListener('error', frameWindow.__loadErrorCatcher, true);
   }
 
 };
