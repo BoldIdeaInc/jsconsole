@@ -62,7 +62,8 @@ export const bindConsole = __console => {
   if (!frameWindow.__rejectedPromiseCatcher) {
     frameWindow.__rejectedPromiseCatcher = event => {
       let error;
-      if (!(event.reason instanceof Error)) {
+      // using duck-typing because some Error objects aren't instances of `Error`
+      if (!event.reason.stack || !event.reason.message) {
         error = new Error(`Uncaught (in promise): ${event.reason}`);
         // The event doesn't contain error information. The Erorr we create will contain
         // misleading stack info. We "tag" the error so the console renderer can ignore the
